@@ -2,6 +2,19 @@ name: CI
 
 on: [push, pull_request, workflow_dispatch]
 jobs:
+  deps:
+    name: Download deps
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - name: set up JDK 1.8
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.8
+      - uses: burrunan/gradle-cache-action@v1
+        with:
+          arguments: androidDependencies
+          gradle-version: wrapper
   test:
     strategy:
         fail-fast: false
@@ -81,6 +94,7 @@ jobs:
             - 'lib-push-firebase'
             - 'lib-state'
     name: Unit Tests
+    needs: deps
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
@@ -89,7 +103,13 @@ jobs:
         with:
           java-version: 1.8
       - name: Test
-        run: ./gradlew ${{ matrix.component }}:assembleRelease ${{ matrix.component }}:testRelease ${{ matrix.component }}:lintRelease
+        uses: burrunan/gradle-cache-action@v1
         env:
-          JAVA_TOOL_OPTIONS: '-Duser.country=US' 
-
+          JAVA_TOOL_OPTIONS: '-Duser.country=US'
+        with:
+          arguments: |
+            ${{ matrix.component }}:assembleRelease
+            ${{ matrix.component }}:testRelease
+            ${{ matrix.component }}:lintRelease
+          gradle-distribution-sha-256-sum-warning: false
+          gradle-version: wrapper
