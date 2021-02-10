@@ -1,0 +1,95 @@
+name: CI
+
+on: [push, pull_request, workflow_dispatch]
+jobs:
+  test:
+    strategy:
+        fail-fast: false
+        matrix:
+          component:
+            - 'browser-awesomebar'
+            - 'browser-domain'
+            - 'browser-engine-gecko'
+            - 'browser-engine-gecko-beta'
+            - 'browser-engine-gecko-nightly'
+            - 'browser-engine-system'
+            - 'browser-errorpages'
+            - 'browser-icons'
+            - 'browser-menu'
+            - 'browser-menu2'
+            - 'browser-search'
+            - 'browser-session'
+            - 'browser-session-storage'
+            - 'browser-storage-memory'
+            - 'browser-storage-sync'
+            - 'browser-tabstray'
+            - 'browser-thumbnails'
+            - 'browser-toolbar'
+            - 'feature-accounts'
+            - 'feature-accounts-push'
+            - 'feature-awesomebar'
+            - 'feature-containers'
+            - 'feature-contextmenu'
+            - 'feature-customtabs'
+            - 'feature-downloads'
+            - 'feature-intent'
+            - 'feature-pwa'
+            - 'feature-readerview'
+            - 'feature-qr'
+            - 'feature-search'
+            - 'feature-session'
+            - 'feature-share'
+            - 'feature-sync'
+            - 'feature-tabs'
+            - 'feature-tab-collection'
+            - 'feature-toolbar'
+            - 'feature-top-sites'
+            - 'feature-prompts'
+            - 'feature-push'
+            - 'feature-findinpage'
+            - 'feature-sitepermissions'
+            - 'feature-webnotifications'
+            - 'feature-webcompat'
+            - 'feature-webcompat-reporter'
+            - 'feature-addons'
+            - 'ui-autocomplete'
+            - 'ui-colors'
+            - 'ui-fonts'
+            - 'ui-icons'
+            - 'ui-tabcounter'
+            - 'service-firefox-accounts'
+            - 'service-sync-logins'
+            - 'service-glean'
+            - 'service-location'
+            - 'service-nimbus'
+            - 'service-pocket'
+            - 'support-android-test'
+            - 'support-base'
+            - 'support-ktx'
+            - 'support-migration'
+            - 'support-test'
+            - 'support-test-appservices'
+            - 'support-test-libstate'
+            - 'support-utils'
+            - 'support-webextensions'
+            - 'lib-crash'
+            - 'lib-dataprotect'
+            - 'lib-fetch-httpurlconnection'
+            - 'lib-fetch-okhttp'
+            - 'lib-jexl'
+            - 'lib-publicsuffixlist'
+            - 'lib-push-firebase'
+            - 'lib-state'
+    name: Unit Tests
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - name: set up JDK 1.8
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.8
+      - name: Test
+        run: ./gradlew ${{ matrix.component }}:assembleRelease ${{ matrix.component }}:testRelease ${{ matrix.component }}:lintRelease
+        env:
+          JAVA_TOOL_OPTIONS: '-Duser.country=US' 
+
